@@ -24,7 +24,7 @@ const useStyles = makeStyles({
   },
   input: {
     flex: 1,
-    padding: "4px 8px",
+    padding: "4px",
     borderRadius: "0",
     border: "none !important",
     backgroundColor: "transparent !important",
@@ -56,7 +56,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
   useEffect(() => {
     // Refocus when value becomes empty (after sending)
     if (value === "") {
-      setTimeout(() => inputRef.current?.focus(), 1000);
+      inputRef.current?.focus();
     }
   }, [value]);
 
