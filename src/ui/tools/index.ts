@@ -4,6 +4,7 @@ import { getSelection } from "./getSelection";
 import { webFetch } from "./webFetch";
 import { getPresentationContent } from "./getPresentationContent";
 import { setPresentationContent } from "./setPresentationContent";
+import { addSlideFromCode } from "./addSlideFromCode";
 
 export const wordTools = [
   getDocumentContent,
@@ -15,6 +16,7 @@ export const wordTools = [
 export const powerpointTools = [
   getPresentationContent,
   setPresentationContent,
+  addSlideFromCode,
   webFetch,
 ];
 
