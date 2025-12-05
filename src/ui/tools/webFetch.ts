@@ -2,7 +2,7 @@ import { Tool } from "../../../copilot-sdk-nodejs/types";
 
 export const webFetch: Tool = {
   name: "web_fetch",
-  description: "Fetch content from a URL. Returns the response text. Useful for getting web page content, API data, etc.",
+  description: "Fetch content from a URL (GET only). Returns the response text. Useful for getting web page content, API data, etc.",
   parameters: {
     type: "object",
     properties: {
@@ -10,27 +10,15 @@ export const webFetch: Tool = {
         type: "string",
         description: "The URL to fetch.",
       },
-      method: {
-        type: "string",
-        enum: ["GET", "POST"],
-        description: "HTTP method. Default GET.",
-      },
-      body: {
-        type: "string",
-        description: "Request body for POST requests.",
-      },
     },
     required: ["url"],
   },
   handler: async ({ arguments: args }) => {
-    const { url, method = "GET", body } = args as { url: string; method?: string; body?: string };
+    const { url } = args as { url: string };
     
     try {
-      const response = await fetch(url, {
-        method,
-        body: method === "POST" ? body : undefined,
-        headers: body ? { "Content-Type": "application/json" } : undefined,
-      });
+      // Use server proxy to avoid CORS
+      const response = await fetch(`/api/fetch?url=${encodeURIComponent(url)}`);
       
       if (!response.ok) {
         return `HTTP ${response.status}: ${response.statusText}`;

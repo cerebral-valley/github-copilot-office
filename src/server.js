@@ -6,14 +6,51 @@ const { setupCopilotProxy } = require('./copilotProxy');
 
 async function createServer() {
   const app = express();
-  app.use(express.json());
-
+  
   // ========== Backend API Routes ==========
+  const apiRouter = express.Router();
+  apiRouter.use(express.json());
   
   // Simple test endpoint
-  app.get('/api/hello', (req, res) => {
+  apiRouter.get('/hello', (req, res) => {
     res.json({ message: 'Hello from backend!', timestamp: new Date().toISOString() });
   });
+
+  // Proxy for web fetch (GET only, avoids CORS)
+  apiRouter.get('/fetch', async (req, res) => {
+    const url = req.query.url;
+    if (!url) {
+      return res.status(400).json({ error: 'Missing url parameter' });
+    }
+    try {
+      const https = require('https');
+      const http = require('http');
+      const parsedUrl = new URL(url);
+      const client = parsedUrl.protocol === 'https:' ? https : http;
+      
+      const options = {
+        hostname: parsedUrl.hostname,
+        path: parsedUrl.pathname + parsedUrl.search,
+        headers: {
+          'User-Agent': 'WordAddinDemo/1.0 (https://github.com; contact@example.com)'
+        }
+      };
+      
+      client.get(options, (response) => {
+        let data = '';
+        response.on('data', chunk => data += chunk);
+        response.on('end', () => {
+          res.type('text/plain').send(data);
+        });
+      }).on('error', (e) => {
+        res.status(500).json({ error: e.message });
+      });
+    } catch (e) {
+      res.status(500).json({ error: e.message });
+    }
+  });
+
+  app.use('/api', apiRouter);
 
   // ========== Vite Dev Server (Frontend) ==========
   
