@@ -109,10 +109,26 @@ PptxGenJS API Examples:
         };
       }
 
-      // Insert into PowerPoint
+      // Insert into PowerPoint after the last slide
       try {
         await PowerPoint.run(async (context) => {
-          context.presentation.insertSlidesFromBase64(base64);
+          const slides = context.presentation.slides;
+          slides.load("items");
+          await context.sync();
+
+          const insertOptions: PowerPoint.InsertSlideOptions = {
+            formatting: PowerPoint.InsertSlideFormatting.useDestinationTheme,
+          };
+
+          // If there are existing slides, insert after the last one
+          if (slides.items.length > 0) {
+            const lastSlide = slides.items[slides.items.length - 1];
+            lastSlide.load("id");
+            await context.sync();
+            insertOptions.targetSlideId = lastSlide.id;
+          }
+
+          context.presentation.insertSlidesFromBase64(base64, insertOptions);
           await context.sync();
         });
       } catch (insertError: any) {
