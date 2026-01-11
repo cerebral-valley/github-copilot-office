@@ -8,6 +8,8 @@ import { addSlideFromCode } from "./addSlideFromCode";
 import { getWorkbookContent } from "./getWorkbookContent";
 import { setWorkbookContent } from "./setWorkbookContent";
 import { getSelectedRange } from "./getSelectedRange";
+import { setSelectedRange } from "./setSelectedRange";
+import { getWorkbookInfo } from "./getWorkbookInfo";
 
 export const wordTools = [
   getDocumentContent,
@@ -24,9 +26,11 @@ export const powerpointTools = [
 ];
 
 export const excelTools = [
+  getWorkbookInfo,
   getWorkbookContent,
   setWorkbookContent,
   getSelectedRange,
+  setSelectedRange,
   webFetch,
 ];
 
