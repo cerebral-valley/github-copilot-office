@@ -24,8 +24,18 @@ const useStyles = makeStyles({
     alignItems: "center",
     justifyContent: "space-between",
     padding: "8px 12px",
+    paddingRight: "40px", // Avoid Office taskpane buttons (close/info)
     gap: "8px",
     minHeight: "40px",
+  },
+  titleSection: {
+    display: "flex",
+    alignItems: "center",
+    gap: "8px",
+  },
+  logo: {
+    width: "20px",
+    height: "20px",
   },
   clearButton: {
     backgroundColor: "#0078d4",
@@ -60,23 +70,26 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({ onNewChat, selectedModel, 
 
   return (
     <div className={styles.header}>
-      <Dropdown
-        className={styles.dropdown}
-        appearance="underline"
-        value={selectedLabel}
-        selectedOptions={[selectedModel]}
-        onOptionSelect={(_, data) => {
-          if (data.optionValue && data.optionValue !== selectedModel) {
-            onModelChange(data.optionValue as ModelType);
-          }
-        }}
-      >
-        {MODELS.map((model) => (
-          <Option key={model.key} value={model.key}>
-            {model.label}
-          </Option>
-        ))}
-      </Dropdown>
+      <div className={styles.titleSection}>
+        <img src="/icon-32.png" alt="GitHub Copilot" className={styles.logo} />
+        <Dropdown
+          className={styles.dropdown}
+          appearance="underline"
+          value={selectedLabel}
+          selectedOptions={[selectedModel]}
+          onOptionSelect={(_, data) => {
+            if (data.optionValue && data.optionValue !== selectedModel) {
+              onModelChange(data.optionValue as ModelType);
+            }
+          }}
+        >
+          {MODELS.map((model) => (
+            <Option key={model.key} value={model.key}>
+              {model.label}
+            </Option>
+          ))}
+        </Dropdown>
+      </div>
       <Tooltip content="New chat" relationship="label">
         <Button
           icon={<Compose24Regular />}

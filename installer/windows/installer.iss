@@ -3,7 +3,7 @@
 
 #define MyAppName "GitHub Copilot Office Add-in"
 #define MyAppVersion "1.0.0"
-#define MyAppPublisher "Your Company"
+#define MyAppPublisher "GitHub"
 #define MyAppURL "https://github.com/your-org/copilot-sdk-office-sample"
 #define MyAppExeName "copilot-office-server.exe"
 
