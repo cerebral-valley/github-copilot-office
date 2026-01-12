@@ -25,14 +25,11 @@ Pop-Location
 # Build the server executable with pkg
 Write-Host "Building server executable..." -ForegroundColor Yellow
 Push-Location $RootDir
-npm exec -- pkg src/server-prod.js `
-    --targets node18-win-x64 `
-    --output "$BuildDir\copilot-office-server.exe" `
-    --compress GZip
+npm exec -- pkg src/server-prod.js --targets node18-win-x64 --output "$BuildDir\copilot-office-server.exe" --compress GZip
 Pop-Location
 
 Write-Host ""
-Write-Host "✓ Windows executable built successfully!" -ForegroundColor Green
+Write-Host "Windows executable built successfully!" -ForegroundColor Green
 Write-Host "  Output: $BuildDir\copilot-office-server.exe"
 Write-Host ""
 
@@ -55,9 +52,8 @@ foreach ($Path in $PossiblePaths) {
 if ($InnoSetupPath) {
     Write-Host "Building installer with Inno Setup..." -ForegroundColor Yellow
     & $InnoSetupPath "$ScriptDir\installer.iss"
-    
     Write-Host ""
-    Write-Host "✓ Windows installer built successfully!" -ForegroundColor Green
+    Write-Host "Windows installer built successfully!" -ForegroundColor Green
     Write-Host "  Output: $BuildDir\CopilotOfficeAddin-Setup-$Version.exe"
 } else {
     Write-Host ""
