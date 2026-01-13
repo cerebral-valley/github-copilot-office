@@ -25,7 +25,17 @@ echo "User home: $USER_HOME"
 # Trust SSL certificate (if it exists)
 if [ -f "$CERT_PATH" ]; then
     echo "Trusting SSL certificate..."
-    security add-trusted-cert -d -r trustRoot -k /Library/Keychains/System.keychain "$CERT_PATH" 2>/dev/null || true
+    # Add to system keychain (requires admin, which installer has)
+    # The -d flag adds to admin cert store, -r trustRoot sets trust settings
+    if security add-trusted-cert -d -r trustRoot -k /Library/Keychains/System.keychain "$CERT_PATH" 2>&1; then
+        echo "SSL certificate trusted successfully"
+    else
+        echo "Warning: Could not add certificate to system keychain."
+        echo "You may need to manually trust the certificate:"
+        echo "  1. Open Keychain Access"
+        echo "  2. Drag $CERT_PATH to the System keychain"
+        echo "  3. Double-click the localhost cert and set 'Always Trust'"
+    fi
 else
     echo "Note: Certificate file not found at $CERT_PATH, skipping trust"
 fi
@@ -79,14 +89,15 @@ if [ -f "$MANIFEST_PATH" ]; then
     WORD_WEF="$USER_HOME/Library/Containers/com.microsoft.Word/Data/Documents/wef"
     PPT_WEF="$USER_HOME/Library/Containers/com.microsoft.Powerpoint/Data/Documents/wef"
     EXCEL_WEF="$USER_HOME/Library/Containers/com.microsoft.Excel/Data/Documents/wef"
+    ONENOTE_WEF="$USER_HOME/Library/Containers/com.microsoft.onenote.mac/Data/Documents/wef"
 
-    for WEF_DIR in "$WORD_WEF" "$PPT_WEF" "$EXCEL_WEF"; do
+    for WEF_DIR in "$WORD_WEF" "$PPT_WEF" "$EXCEL_WEF" "$ONENOTE_WEF"; do
         mkdir -p "$WEF_DIR"
         cp "$MANIFEST_PATH" "$WEF_DIR/"
         chown -R $INSTALL_USER:staff "$WEF_DIR"
     done
 
-    echo "Add-in registered for Word, PowerPoint, and Excel"
+    echo "Add-in registered for Word, PowerPoint, Excel, and OneNote"
 else
     echo "Note: Manifest file not found at $MANIFEST_PATH"
 fi

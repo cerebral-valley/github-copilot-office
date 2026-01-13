@@ -117,7 +117,7 @@ cat > "$BUILD_DIR/welcome.html" << 'EOF'
     <p>The installer will:</p>
     <ul>
         <li>Install the add-in application to your Applications folder</li>
-        <li>Register the add-in with Word, PowerPoint, and Excel</li>
+        <li>Register the add-in with Word, PowerPoint, Excel, and OneNote</li>
         <li>Configure the service to start automatically at login</li>
         <li>Add a menu bar icon for easy access</li>
     </ul>
@@ -144,7 +144,7 @@ cat > "$BUILD_DIR/conclusion.html" << 'EOF'
     <p><strong>Next steps:</strong></p>
     <ol>
         <li>Look for the GitHub Copilot icon in your menu bar</li>
-        <li>Open Word, PowerPoint, or Excel</li>
+        <li>Open Word, PowerPoint, Excel, or OneNote</li>
         <li>Find the "GitHub Copilot" button on the Home ribbon</li>
         <li>Click the button to open the Copilot panel</li>
     </ol>

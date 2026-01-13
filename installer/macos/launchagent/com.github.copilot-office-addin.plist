@@ -7,28 +7,23 @@
     
     <key>ProgramArguments</key>
     <array>
-        <string>/Applications/GitHub Copilot Office Add-in/copilot-office-server</string>
+        <string>/usr/bin/open</string>
+        <string>-a</string>
+        <string>/Applications/GitHub Copilot Office Add-in.app</string>
+        <string>--args</string>
+        <string>--hidden</string>
     </array>
-    
-    <key>WorkingDirectory</key>
-    <string>/Applications/GitHub Copilot Office Add-in</string>
     
     <key>RunAtLoad</key>
     <true/>
     
     <key>KeepAlive</key>
-    <true/>
+    <false/>
     
     <key>StandardOutPath</key>
     <string>/tmp/copilot-office-addin.log</string>
     
     <key>StandardErrorPath</key>
     <string>/tmp/copilot-office-addin.err</string>
-    
-    <key>EnvironmentVariables</key>
-    <dict>
-        <key>PATH</key>
-        <string>/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
-    </dict>
 </dict>
 </plist>

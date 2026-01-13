@@ -36,8 +36,9 @@ echo "Removing add-in registrations..."
 WORD_WEF="$USER_HOME/Library/Containers/com.microsoft.Word/Data/Documents/wef"
 PPT_WEF="$USER_HOME/Library/Containers/com.microsoft.Powerpoint/Data/Documents/wef"
 EXCEL_WEF="$USER_HOME/Library/Containers/com.microsoft.Excel/Data/Documents/wef"
+ONENOTE_WEF="$USER_HOME/Library/Containers/com.microsoft.onenote.mac/Data/Documents/wef"
 
-for WEF_DIR in "$WORD_WEF" "$PPT_WEF" "$EXCEL_WEF"; do
+for WEF_DIR in "$WORD_WEF" "$PPT_WEF" "$EXCEL_WEF" "$ONENOTE_WEF"; do
     rm -f "$WEF_DIR/manifest.xml" 2>/dev/null || true
 done
 

@@ -61,7 +61,7 @@ npm run build:windows
 1. Installs to `/Applications/GitHub Copilot Office Add-in/`
 2. Copies the built frontend, certificates, and manifest
 3. Trusts the SSL certificate (adds to System keychain)
-4. Registers the add-in with Word, PowerPoint, and Excel (wef folders)
+4. Registers the add-in with Word, PowerPoint, Excel, and OneNote (wef folders)
 5. Installs a LaunchAgent to start on login
 6. Starts the service immediately after install
 
