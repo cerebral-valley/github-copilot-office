@@ -1,14 +1,10 @@
 /*---------------------------------------------------------------------------------------------
- *  FORK: WebSocket-based CopilotClient for browser environments
- *  This file is an addition for Word add-in support, not part of the original SDK.
- *  It is self-contained to avoid importing Node.js modules.
+ *  WebSocket-based CopilotClient for browser environments
+ *  Custom client that connects to the Copilot CLI via WebSocket proxy
  *--------------------------------------------------------------------------------------------*/
 
-import {
-    createMessageConnection,
-    MessageConnection,
-} from "vscode-jsonrpc";
-import { WebSocketMessageReader, WebSocketMessageWriter } from "./websocket-transport.js";
+import { createMessageConnection, MessageConnection } from "vscode-jsonrpc";
+import { WebSocketMessageReader, WebSocketMessageWriter } from "./websocket-transport";
 import type {
     SessionConfig,
     SessionEvent,
@@ -16,10 +12,20 @@ import type {
     MessageOptions,
     Tool,
     ToolHandler,
-    ToolCallRequestPayload,
-    ToolCallResponsePayload,
+    ToolInvocation,
     ToolResult,
-} from "./types.js";
+} from "@github/copilot-sdk";
+
+interface ToolCallRequestPayload {
+    sessionId: string;
+    toolCallId: string;
+    toolName: string;
+    arguments: unknown;
+}
+
+interface ToolCallResponsePayload {
+    result: ToolResult;
+}
 
 /**
  * Browser-compatible CopilotSession
@@ -213,12 +219,13 @@ export class WebSocketCopilotClient {
                     };
                 }
                 try {
-                    const result = await handler({
+                    const invocation: ToolInvocation = {
                         sessionId: params.sessionId,
                         toolCallId: params.toolCallId,
                         toolName: params.toolName,
                         arguments: params.arguments,
-                    });
+                    };
+                    const result = await handler(invocation);
                     console.log('[tool.call] result', result);
                     return { result: typeof result === "string" ? result : result };
                 } catch (error) {

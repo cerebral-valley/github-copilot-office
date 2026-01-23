@@ -1,6 +1,6 @@
 /*---------------------------------------------------------------------------------------------
- *  FORK: WebSocket transport for browser environments
- *  This file is an addition for Word add-in support, not part of the original SDK.
+ *  WebSocket transport for browser environments
+ *  Custom transport layer for vscode-jsonrpc over WebSocket
  *--------------------------------------------------------------------------------------------*/
 
 import {

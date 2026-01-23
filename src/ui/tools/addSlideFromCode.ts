@@ -1,4 +1,4 @@
-import { Tool } from "../../../copilot-sdk-nodejs/types";
+import type { Tool } from "@github/copilot-sdk";
 import pptxgen from "pptxgenjs";
 
 export const addSlideFromCode: Tool = {

@@ -35,9 +35,4 @@ module.exports = defineConfig({
       port: 3000,
     },
   },
-  resolve: {
-    alias: {
-      'copilot-sdk': path.resolve(__dirname, '../../../github/copilot-agent-runtime/copilot-sdk/nodejs/src'),
-    },
-  },
 });

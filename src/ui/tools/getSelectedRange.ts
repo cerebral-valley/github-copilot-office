@@ -1,4 +1,4 @@
-import { Tool } from "../../../copilot-sdk-nodejs/types";
+import type { Tool } from "@github/copilot-sdk";
 
 export const getSelectedRange: Tool = {
   name: "get_selected_range",

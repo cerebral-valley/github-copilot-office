@@ -1,4 +1,4 @@
-import { Tool } from "../../../copilot-sdk-nodejs/types";
+import type { Tool } from "@github/copilot-sdk";
 
 export const getWorkbookContent: Tool = {
   name: "get_workbook_content",

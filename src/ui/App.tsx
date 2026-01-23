@@ -10,7 +10,7 @@ import { Message, MessageList } from "./components/MessageList";
 import { HeaderBar, ModelType } from "./components/HeaderBar";
 import { useIsDarkMode } from "./useIsDarkMode";
 import { useLocalStorage } from "./useLocalStorage";
-import { createWebSocketClient } from "../../copilot-sdk-nodejs/websocket-client";
+import { createWebSocketClient } from "./lib/websocket-client";
 import { getToolsForHost } from "./tools";
 import React from "react";
 
