@@ -10,6 +10,7 @@ export interface Message {
   sender: "user" | "assistant" | "tool";
   timestamp: Date;
   toolName?: string;
+  toolArgs?: Record<string, unknown>;
   images?: Array<{ dataUrl: string; name: string }>;
 }
 
@@ -19,6 +20,83 @@ interface MessageListProps {
   isConnecting?: boolean;
   currentActivity?: string;
   streamingText?: string;
+}
+
+// Tool display configuration
+const toolConfig: Record<string, { icon: string; format: (args: Record<string, unknown>) => string }> = {
+  get_slide_image: {
+    icon: "📸",
+    format: (args) => `Capturing slide ${(args.slideIndex as number) + 1}`,
+  },
+  get_presentation_overview: {
+    icon: "📊",
+    format: () => "Getting presentation overview",
+  },
+  get_presentation_content: {
+    icon: "📄",
+    format: (args) => {
+      if (args.slideIndex !== undefined) return `Reading slide ${(args.slideIndex as number) + 1}`;
+      if (args.startIndex !== undefined && args.endIndex !== undefined) 
+        return `Reading slides ${(args.startIndex as number) + 1}–${(args.endIndex as number) + 1}`;
+      return "Reading all slides";
+    },
+  },
+  set_presentation_content: {
+    icon: "✏️",
+    format: (args) => `Adding content to slide ${(args.slideIndex as number) + 1}`,
+  },
+  clear_slide: {
+    icon: "🗑️",
+    format: (args) => `Clearing slide ${(args.slideIndex as number) + 1}`,
+  },
+  add_slide_from_code: {
+    icon: "➕",
+    format: () => "Creating new slide",
+  },
+  update_slide_shape: {
+    icon: "✏️",
+    format: (args) => `Updating shape on slide ${(args.slideIndex as number) + 1}`,
+  },
+  get_document_content: {
+    icon: "📄",
+    format: () => "Reading document",
+  },
+  set_document_content: {
+    icon: "✏️",
+    format: () => "Updating document",
+  },
+  get_workbook_info: {
+    icon: "📊",
+    format: () => "Getting workbook structure",
+  },
+  get_workbook_content: {
+    icon: "📄",
+    format: (args) => args.sheetName ? `Reading "${args.sheetName}"` : "Reading worksheet",
+  },
+  set_workbook_content: {
+    icon: "✏️",
+    format: (args) => args.sheetName ? `Updating "${args.sheetName}"` : "Updating worksheet",
+  },
+  web_fetch: {
+    icon: "🌐",
+    format: (args) => {
+      try {
+        const url = new URL(args.url as string);
+        return `Fetching ${url.hostname}`;
+      } catch {
+        return "Fetching web content";
+      }
+    },
+  },
+};
+
+function formatToolCall(toolName: string, args: Record<string, unknown>): { icon: string; description: string } {
+  const config = toolConfig[toolName];
+  if (config) {
+    return { icon: config.icon, description: config.format(args) };
+  }
+  // Fallback for unknown tools
+  return { icon: "🔧", description: toolName.replace(/_/g, " ") };
 }
 
 const useStyles = makeStyles({
@@ -73,14 +151,22 @@ const useStyles = makeStyles({
   },
   messageTool: {
     alignSelf: "flex-start",
-    fontSize: "12px",
-    color: "var(--colorNeutralForeground3)",
+    fontSize: "13px",
+    color: "var(--colorNeutralForeground2)",
     cursor: "pointer",
-    display: "grid",
-    gridTemplateColumns: "24px 1fr",
-    gap: "8px",
+    display: "inline-flex",
     alignItems: "center",
-    justifyItems: "center",
+    gap: "6px",
+    padding: "4px 10px",
+    borderRadius: "12px",
+    backgroundColor: "var(--colorNeutralBackground4)",
+    transition: "background-color 0.15s",
+    ":hover": {
+      backgroundColor: "var(--colorNeutralBackground5)",
+    },
+  },
+  toolIcon: {
+    fontSize: "14px",
   },
   toolArgs: {
     fontSize: "11px",
@@ -185,7 +271,13 @@ export const MessageList: React.FC<MessageListProps> = ({
         </div>
       )}
       
-      {messages.map((message) => (
+      {messages.map((message) => {
+        // Format tool calls nicely
+        const toolDisplay = message.toolName 
+          ? formatToolCall(message.toolName, message.toolArgs || {})
+          : null;
+        
+        return (
         <div
           key={message.id}
           className={
@@ -194,16 +286,15 @@ export const MessageList: React.FC<MessageListProps> = ({
             styles.messageAssistant
           }
           onClick={message.toolName ? () => toggleTool(message.id) : undefined}
+          title={message.toolName ? "Click to show details" : undefined}
         >
-          {message.toolName ? (
+          {toolDisplay ? (
             <>
-              <span style={{ marginTop: '0' }}>🔧</span>
-              <div style={{ justifySelf: 'start' }}>
-                {message.toolName}
-                {expandedTools.has(message.id) && (
-                  <div className={styles.toolArgs}>{message.text}</div>
-                )}
-              </div>
+              <span className={styles.toolIcon}>{toolDisplay.icon}</span>
+              <span>{toolDisplay.description}</span>
+              {expandedTools.has(message.id) && (
+                <div className={styles.toolArgs}>{message.text}</div>
+              )}
             </>
           ) : message.sender === "assistant" ? (
             <>
@@ -226,7 +317,8 @@ export const MessageList: React.FC<MessageListProps> = ({
             </>
           )}
         </div>
-      ))}
+      );
+      })}
       
       {isTyping && (
         <div className={styles.messageAssistant}>

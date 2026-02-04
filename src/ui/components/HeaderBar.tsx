@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Button, Tooltip, makeStyles, Dropdown, Option } from "@fluentui/react-components";
-import { Compose24Regular } from "@fluentui/react-icons";
+import { Compose24Regular, History24Regular } from "@fluentui/react-icons";
 
 export type ModelType = "gpt-5" | "claude-sonnet-4" | "claude-sonnet-4.5" | "claude-opus-4.5" | "claude-haiku-4.5";
 
@@ -14,6 +14,7 @@ const MODELS: { key: ModelType; label: string }[] = [
 
 interface HeaderBarProps {
   onNewChat: () => void;
+  onShowHistory: () => void;
   selectedModel: ModelType;
   onModelChange: (model: ModelType) => void;
 }
@@ -53,6 +54,12 @@ const useStyles = makeStyles({
       backgroundColor: "#106ebe",
     },
   },
+  historyButton: {
+    minWidth: "28px",
+    width: "28px",
+    height: "28px",
+    padding: "0",
+  },
   dropdown: {
     minWidth: "120px",
     opacity: 0.6,
@@ -62,9 +69,14 @@ const useStyles = makeStyles({
       opacity: 1,
     },
   },
+  buttonGroup: {
+    display: "flex",
+    alignItems: "center",
+    gap: "4px",
+  },
 });
 
-export const HeaderBar: React.FC<HeaderBarProps> = ({ onNewChat, selectedModel, onModelChange }) => {
+export const HeaderBar: React.FC<HeaderBarProps> = ({ onNewChat, onShowHistory, selectedModel, onModelChange }) => {
   const styles = useStyles();
   const selectedLabel = MODELS.find(m => m.key === selectedModel)?.label || selectedModel;
 
@@ -87,14 +99,25 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({ onNewChat, selectedModel, 
           </Option>
         ))}
       </Dropdown>
-      <Tooltip content="New chat" relationship="label">
-        <Button
-          icon={<Compose24Regular />}
-          onClick={onNewChat}
-          aria-label="New chat"
-          className={styles.clearButton}
-        />
-      </Tooltip>
+      <div className={styles.buttonGroup}>
+        <Tooltip content="History" relationship="label">
+          <Button
+            icon={<History24Regular />}
+            appearance="subtle"
+            onClick={onShowHistory}
+            aria-label="History"
+            className={styles.historyButton}
+          />
+        </Tooltip>
+        <Tooltip content="New chat" relationship="label">
+          <Button
+            icon={<Compose24Regular />}
+            onClick={onNewChat}
+            aria-label="New chat"
+            className={styles.clearButton}
+          />
+        </Tooltip>
+      </div>
     </div>
   );
 };

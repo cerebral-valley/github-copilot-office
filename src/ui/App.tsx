@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   FluentProvider,
   webLightTheme,
@@ -8,10 +8,18 @@ import {
 import { ChatInput, ImageAttachment } from "./components/ChatInput";
 import { Message, MessageList } from "./components/MessageList";
 import { HeaderBar, ModelType } from "./components/HeaderBar";
+import { SessionHistory } from "./components/SessionHistory";
 import { useIsDarkMode } from "./useIsDarkMode";
 import { useLocalStorage } from "./useLocalStorage";
 import { createWebSocketClient } from "./lib/websocket-client";
 import { getToolsForHost } from "./tools";
+import { 
+  SavedSession, 
+  OfficeHost, 
+  saveSession, 
+  generateSessionTitle, 
+  getHostFromOfficeHost 
+} from "./sessionStorage";
 import React from "react";
 
 const useStyles = makeStyles({
@@ -37,22 +45,55 @@ export const App: React.FC = () => {
   const [client, setClient] = useState<any>(null);
   const [error, setError] = useState("");
   const [selectedModel, setSelectedModel] = useLocalStorage<ModelType>("word-addin-selected-model", DEFAULT_MODEL);
+  const [showHistory, setShowHistory] = useState(false);
+  const [currentSessionId, setCurrentSessionId] = useState<string>("");
+  const [officeHost, setOfficeHost] = useState<OfficeHost>("word");
   const isDarkMode = useIsDarkMode();
+  
+  // Track session creation time
+  const sessionCreatedAt = useRef<string>("");
 
-  const startNewSession = async (model: ModelType) => {
-    setMessages([]);
+  // Save session whenever messages change (debounced effect)
+  useEffect(() => {
+    if (messages.length === 0 || !currentSessionId) return;
+    
+    // Only save if there's at least one user message
+    const hasUserMessage = messages.some(m => m.sender === "user");
+    if (!hasUserMessage) return;
+
+    const savedSession: SavedSession = {
+      id: currentSessionId,
+      title: generateSessionTitle(messages),
+      model: selectedModel,
+      messages: messages,
+      createdAt: sessionCreatedAt.current,
+      updatedAt: new Date().toISOString(),
+    };
+    
+    saveSession(officeHost, savedSession);
+  }, [messages, currentSessionId, selectedModel, officeHost]);
+
+  const startNewSession = async (model: ModelType, restoredMessages?: Message[]) => {
+    // Generate new session ID
+    const newSessionId = crypto.randomUUID();
+    setCurrentSessionId(newSessionId);
+    sessionCreatedAt.current = new Date().toISOString();
+    
+    setMessages(restoredMessages || []);
     setInputValue("");
     setImages([]);
     setIsTyping(false);
     setCurrentActivity("");
     setStreamingText("");
     setError("");
+    setShowHistory(false);
     
     try {
       if (client) {
         await client.stop();
       }
       const host = Office.context.host;
+      setOfficeHost(getHostFromOfficeHost(host));
       const tools = getToolsForHost(host);
       const newClient = await createWebSocketClient(`wss://${location.host}/api/copilot`);
       setClient(newClient);
@@ -92,6 +133,14 @@ Always use your tools to interact with the document. Never ask users to save, ex
     } catch (e: any) {
       setError(`Failed to create session: ${e.message}`);
     }
+  };
+
+  const handleRestoreSession = (savedSession: SavedSession) => {
+    // Restore the session with its messages and model
+    setCurrentSessionId(savedSession.id);
+    sessionCreatedAt.current = savedSession.createdAt;
+    setSelectedModel(savedSession.model);
+    startNewSession(savedSession.model, savedSession.messages);
   };
 
   useEffect(() => {
@@ -177,12 +226,14 @@ Always use your tools to interact with the document. Never ask users to save, ex
           }]);
         } else if (event.type === 'tool.execution_start') {
           const toolName = (event.data as any).toolName;
+          const toolArgs = (event.data as any).arguments || {};
           setCurrentActivity(`Calling ${toolName}...`);
           setMessages((prev) => [...prev, {
             id: event.id,
-            text: JSON.stringify((event.data as any).arguments, null, 2),
+            text: JSON.stringify(toolArgs, null, 2),
             sender: "tool",
             toolName: toolName,
+            toolArgs: toolArgs,
             timestamp: new Date(event.timestamp),
           }]);
         } else if (event.type === 'tool.execution_end') {
@@ -205,11 +256,25 @@ Always use your tools to interact with the document. Never ask users to save, ex
     }
   };
 
+  // Show history panel
+  if (showHistory) {
+    return (
+      <FluentProvider theme={isDarkMode ? webDarkTheme : webLightTheme}>
+        <SessionHistory
+          host={officeHost}
+          onSelectSession={handleRestoreSession}
+          onClose={() => setShowHistory(false)}
+        />
+      </FluentProvider>
+    );
+  }
+
   return (
     <FluentProvider theme={isDarkMode ? webDarkTheme : webLightTheme}>
       <div className={styles.container}>
         <HeaderBar 
           onNewChat={() => startNewSession(selectedModel)} 
+          onShowHistory={() => setShowHistory(true)}
           selectedModel={selectedModel}
           onModelChange={handleModelChange}
         />
