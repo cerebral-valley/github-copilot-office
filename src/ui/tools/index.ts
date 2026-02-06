@@ -29,6 +29,13 @@ import { getSlideNotes } from "./getSlideNotes";
 import { setSlideNotes } from "./setSlideNotes";
 import { duplicateSlide } from "./duplicateSlide";
 
+// New Excel tools
+import { getWorkbookOverview } from "./getWorkbookOverview";
+import { findAndReplaceCells } from "./findAndReplaceCells";
+import { insertChart } from "./insertChart";
+import { applyCellFormatting } from "./applyCellFormatting";
+import { createNamedRange } from "./createNamedRange";
+
 export const wordTools = [
   getDocumentOverview,
   getDocumentContent,
@@ -58,11 +65,16 @@ export const powerpointTools = [
 ];
 
 export const excelTools = [
+  getWorkbookOverview,
   getWorkbookInfo,
   getWorkbookContent,
   setWorkbookContent,
   getSelectedRange,
   setSelectedRange,
+  findAndReplaceCells,
+  insertChart,
+  applyCellFormatting,
+  createNamedRange,
   webFetch,
 ];
 
