@@ -66,21 +66,31 @@ async function startServer() {
 async function stopServer() {
   if (server) {
     return new Promise((resolve) => {
-      // Close WebSocket connections first
-      if (server.closeWebSockets) {
-        server.closeWebSockets();
-      }
-      
-      // Force close all connections
-      server.closeAllConnections();
-      
-      server.close(() => {
+      try {
+        // Close WebSocket connections first
+        if (server.closeWebSockets) {
+          server.closeWebSockets();
+        }
+        
+        // Force close all connections (if method exists)
+        if (typeof server.closeAllConnections === 'function') {
+          server.closeAllConnections();
+        }
+        
+        server.close(() => {
+          server = null;
+          serverRunning = false;
+          console.log('Server stopped');
+          updateTrayMenu();
+          resolve();
+        });
+      } catch (error) {
+        console.error('Error stopping server:', error);
         server = null;
         serverRunning = false;
-        console.log('Server stopped');
         updateTrayMenu();
         resolve();
-      });
+      }
     });
   }
 }

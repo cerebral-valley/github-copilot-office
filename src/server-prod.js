@@ -111,8 +111,8 @@ async function createServer() {
   const distPath = path.join(BASE_PATH, 'dist');
   app.use(express.static(distPath));
   
-  // Fallback to index.html for SPA routing
-  app.get('*path', (req, res) => {
+  // SPA fallback - serve index.html for any non-API route
+  app.use((req, res) => {
     res.sendFile(path.join(distPath, 'index.html'));
   });
 
