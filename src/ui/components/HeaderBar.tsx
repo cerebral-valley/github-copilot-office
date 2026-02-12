@@ -2,7 +2,7 @@ import * as React from "react";
 import { Button, Tooltip, makeStyles, Dropdown, Option } from "@fluentui/react-components";
 import { Compose24Regular, History24Regular } from "@fluentui/react-icons";
 
-export type ModelType = "gpt-5" | "claude-sonnet-4" | "claude-sonnet-4.5" | "claude-opus-4.5" | "claude-haiku-4.5";
+export type ModelType = "gpt-5" | "claude-sonnet-4" | "claude-sonnet-4.5" | "claude-opus-4.5" | "claude-haiku-4.5" | "gpt-4.1";
 
 const MODELS: { key: ModelType; label: string }[] = [
   { key: "claude-opus-4.5", label: "Claude Opus 4.5" },
@@ -10,6 +10,7 @@ const MODELS: { key: ModelType; label: string }[] = [
   { key: "claude-sonnet-4", label: "Claude Sonnet 4" },
   { key: "claude-haiku-4.5", label: "Claude Haiku 4.5" },
   { key: "gpt-5", label: "GPT 5" },
+  { key: "gpt-4.1", label: "GPT 4.1" },
 ];
 
 interface HeaderBarProps {

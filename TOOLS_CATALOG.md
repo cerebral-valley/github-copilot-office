@@ -5,7 +5,7 @@ This document lists all available tools that GitHub Copilot can use when working
 ## Word Tools
 
 | Tool | Description |
-|------|-------------|
+| --- | --- |
 | `get_document_overview` | Get a structural overview of the document including word count, heading hierarchy, table count, and list count. Use this first to understand the document structure. |
 | `get_document_content` | Get the full HTML content of the Word document. |
 | `get_document_section` | Read content of a specific section by heading name. More efficient than reading the entire document. |
@@ -21,7 +21,7 @@ This document lists all available tools that GitHub Copilot can use when working
 ## PowerPoint Tools
 
 | Tool | Description |
-|------|-------------|
+| --- | --- |
 | `get_presentation_overview` | Get a quick overview of the presentation with slide count and content previews. Use this first. |
 | `get_presentation_content` | Read text content from slides with support for chunked reading of large presentations. |
 | `get_slide_image` | Capture a slide as a PNG image for visual inspection before making changes. |
@@ -37,7 +37,7 @@ This document lists all available tools that GitHub Copilot can use when working
 ## Excel Tools
 
 | Tool | Description |
-|------|-------------|
+| --- | --- |
 | `get_workbook_overview` | Get a structural overview of the workbook including sheets, used ranges, named ranges, and chart counts. Use this first. |
 | `get_workbook_info` | List all worksheet names and the active sheet. |
 | `get_workbook_content` | Read cell values and formulas from a worksheet or specific range. |
@@ -48,6 +48,10 @@ This document lists all available tools that GitHub Copilot can use when working
 | `insert_chart` | Create charts (column, bar, line, pie, area, scatter, doughnut) from a data range. |
 | `apply_cell_formatting` | Format cells with bold, colors, borders, number formats, and alignment. |
 | `create_named_range` | Define named ranges for easier reference in formulas and AI interactions. |
+| `add_worksheet` | Add a new worksheet to the workbook, optionally with a name and position. |
+| `set_range_formulas` | Set formulas across a range with row/column-aware patterns, preserving relative references. |
+| `apply_conditional_formatting_preset` | Apply preset conditional formatting rules (color scales, data bars, icons) to a range. |
+| `create_pivot_table` | Create a pivot table from a source range with row/column/value field configuration. |
 | `web_fetch` | Fetch content from a URL and convert to markdown. |
 
 ---
@@ -55,7 +59,9 @@ This document lists all available tools that GitHub Copilot can use when working
 ## Tool Usage Patterns
 
 ### Start with Overview Tools
+
 Always begin by using the overview tool for your application:
+
 - Word: `get_document_overview`
 - PowerPoint: `get_presentation_overview`  
 - Excel: `get_workbook_overview`
@@ -63,10 +69,12 @@ Always begin by using the overview tool for your application:
 This helps Copilot understand your document structure before making targeted reads or edits.
 
 ### Surgical Edits vs Full Replacement
+
 - **Surgical**: Use `insert_content_at_selection`, `find_and_replace`, `update_slide_shape` for targeted changes
 - **Full replacement**: Use `set_document_content`, `add_slide_from_code` when rebuilding content
 
 ### PowerPoint: Code-Based Slide Creation
+
 The `add_slide_from_code` tool is the most powerful way to create slides. It accepts JavaScript code using the PptxGenJS API:
 
 ```javascript
@@ -80,7 +88,9 @@ slide.addText([
 ```
 
 ### Excel: Formatting After Data
+
 When working with Excel data:
+
 1. Use `set_workbook_content` to write data
 2. Use `apply_cell_formatting` to style headers and cells
 3. Use `insert_chart` to visualize the data

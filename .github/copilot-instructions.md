@@ -25,9 +25,15 @@
 - Register/unregister scripts (`register.ps1`, `register.sh`) trust the dev cert and register the manifest.
 
 ## Integration Points
-- Office add-in manifest: `manifest.xml` (hosts Document/Workbook/Presentation/Notebook).
+- Office add-in manifest: `manifest.xml` (hosts Document/Workbook/Presentation).
 - Copilot SDK + proxy: `@github/copilot-sdk` and `src/copilotProxy.js` (WebSocket proxy hooked into the HTTPS server).
 - Electron tray app entry: `src/tray/main.js` (started via `npm run start:tray`).
+
+## Tool Addition
+- Excel tool guide: `docs/excel_tool_addition.md`
+- Word tool guide: `docs/word_tool_addition.md`
+- PowerPoint tool guide: `docs/powerpoint_tool_addition.md`
+- When adding or changing tools, update `TOOLS_CATALOG.md` to keep the tool list in sync.
 
 ## Security
 - TLS certs are self-signed for localhost only (`certs/README.md`), trusted via register scripts; do not repurpose for production.

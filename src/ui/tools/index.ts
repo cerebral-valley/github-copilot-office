@@ -35,6 +35,10 @@ import { findAndReplaceCells } from "./findAndReplaceCells";
 import { insertChart } from "./insertChart";
 import { applyCellFormatting } from "./applyCellFormatting";
 import { createNamedRange } from "./createNamedRange";
+import { addWorksheet } from "./addWorksheet";
+import { setRangeFormulas } from "./setRangeFormulas";
+import { applyConditionalFormattingPreset } from "./applyConditionalFormattingPreset";
+import { createPivotTable } from "./createPivotTable";
 
 export const wordTools = [
   getDocumentOverview,
@@ -75,6 +79,10 @@ export const excelTools = [
   insertChart,
   applyCellFormatting,
   createNamedRange,
+  addWorksheet,
+  setRangeFormulas,
+  applyConditionalFormattingPreset,
+  createPivotTable,
   webFetch,
 ];
 
