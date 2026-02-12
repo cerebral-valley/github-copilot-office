@@ -1,12 +1,8 @@
 import type { Tool } from "@github/copilot-sdk";
 
-const aggregationMap: Record<string, Excel.AggregationFunction> = {
-  sum: Excel.AggregationFunction.sum,
-  count: Excel.AggregationFunction.count,
-  average: Excel.AggregationFunction.average,
-  max: Excel.AggregationFunction.max,
-  min: Excel.AggregationFunction.min,
-};
+const supportedAggregations = ["sum", "count", "average", "max", "min"] as const;
+
+type SupportedAggregation = (typeof supportedAggregations)[number];
 
 export const createPivotTable: Tool = {
   name: "create_pivot_table",
@@ -121,9 +117,25 @@ summarizeBy supports: sum, count, average, max, min
           for (const valueField of values) {
             const dataHierarchy = pivot.dataHierarchies.add(pivot.hierarchies.getItem(valueField.field));
             if (valueField.summarizeBy) {
-              const agg = aggregationMap[valueField.summarizeBy.toLowerCase()];
-              if (agg) {
-                dataHierarchy.summarizeBy = agg;
+              const summarizeBy = valueField.summarizeBy.toLowerCase() as SupportedAggregation;
+              switch (summarizeBy) {
+                case "sum":
+                  dataHierarchy.summarizeBy = Excel.AggregationFunction.sum;
+                  break;
+                case "count":
+                  dataHierarchy.summarizeBy = Excel.AggregationFunction.count;
+                  break;
+                case "average":
+                  dataHierarchy.summarizeBy = Excel.AggregationFunction.average;
+                  break;
+                case "max":
+                  dataHierarchy.summarizeBy = Excel.AggregationFunction.max;
+                  break;
+                case "min":
+                  dataHierarchy.summarizeBy = Excel.AggregationFunction.min;
+                  break;
+                default:
+                  break;
               }
             }
           }

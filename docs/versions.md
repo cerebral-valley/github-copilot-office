@@ -33,3 +33,9 @@ This file tracks the repository's released and checkpointed versions for quick r
 
 - Pre-fix backup checkpoint before Word/PowerPoint blank-pane runtime fix.
 - Created to provide a safe restore point on `origin/main`.
+
+## v1.0.3
+
+- Fixed Word/PowerPoint blank add-in pane caused by top-level `Excel.*` access in `create_pivot_table` tool module.
+- Moved Excel aggregation enum mapping to runtime-only logic inside the Excel handler path.
+- Preserved Excel pivot table behavior while avoiding cross-host module initialization crashes.
