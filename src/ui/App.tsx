@@ -18,7 +18,8 @@ import {
   OfficeHost, 
   saveSession, 
   generateSessionTitle, 
-  getHostFromOfficeHost 
+  getHostFromOfficeHost,
+  getDocumentScopeKey,
 } from "./sessionStorage";
 import React from "react";
 
@@ -48,6 +49,7 @@ export const App: React.FC = () => {
   const [showHistory, setShowHistory] = useState(false);
   const [currentSessionId, setCurrentSessionId] = useState<string>("");
   const [officeHost, setOfficeHost] = useState<OfficeHost>("word");
+  const [documentScopeKey, setDocumentScopeKey] = useState<string>("unsaved-word");
   const isDarkMode = useIsDarkMode();
   
   // Track session creation time
@@ -70,8 +72,8 @@ export const App: React.FC = () => {
       updatedAt: new Date().toISOString(),
     };
     
-    saveSession(officeHost, savedSession);
-  }, [messages, currentSessionId, selectedModel, officeHost]);
+    saveSession(officeHost, documentScopeKey, savedSession);
+  }, [messages, currentSessionId, selectedModel, officeHost, documentScopeKey]);
 
   const startNewSession = async (model: ModelType, restoredMessages?: Message[]) => {
     // Generate new session ID
@@ -93,7 +95,10 @@ export const App: React.FC = () => {
         await client.stop();
       }
       const host = Office.context.host;
-      setOfficeHost(getHostFromOfficeHost(host));
+      const resolvedOfficeHost = getHostFromOfficeHost(host);
+      setOfficeHost(resolvedOfficeHost);
+      const resolvedDocumentScope = await getDocumentScopeKey(resolvedOfficeHost);
+      setDocumentScopeKey(resolvedDocumentScope);
       const tools = getToolsForHost(host);
       const newClient = await createWebSocketClient(`wss://${location.host}/api/copilot`);
       setClient(newClient);
@@ -262,6 +267,7 @@ Always use your tools to interact with the document. Never ask users to save, ex
       <FluentProvider theme={isDarkMode ? webDarkTheme : webLightTheme}>
         <SessionHistory
           host={officeHost}
+          scopeKey={documentScopeKey}
           onSelectSession={handleRestoreSession}
           onClose={() => setShowHistory(false)}
         />

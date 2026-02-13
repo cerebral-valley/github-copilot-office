@@ -39,3 +39,10 @@ This file tracks the repository's released and checkpointed versions for quick r
 - Fixed Word/PowerPoint blank add-in pane caused by top-level `Excel.*` access in `create_pivot_table` tool module.
 - Moved Excel aggregation enum mapping to runtime-only logic inside the Excel handler path.
 - Preserved Excel pivot table behavior while avoiding cross-host module initialization crashes.
+
+## v1.0.4
+
+- Expanded `insert_chart` into a validated generic chart tool that resolves against `Excel.ChartType` values, including surface/stock and other advanced chart families.
+- Added graceful fallback behavior for unsupported chart requests with user-facing retry messaging.
+- Scoped chat session persistence by host + document/workbook scope key to prevent cross-file context spillover.
+- Updated session history loading/deletion to respect document-level scope isolation.

@@ -6,6 +6,7 @@ import { getSavedSessions, deleteSession } from "../sessionStorage";
 
 interface SessionHistoryProps {
   host: OfficeHost;
+  scopeKey: string;
   onSelectSession: (session: SavedSession) => void;
   onClose: () => void;
 }
@@ -114,6 +115,7 @@ function formatDate(dateString: string): string {
 
 export const SessionHistory: React.FC<SessionHistoryProps> = ({
   host,
+  scopeKey,
   onSelectSession,
   onClose,
 }) => {
@@ -121,13 +123,13 @@ export const SessionHistory: React.FC<SessionHistoryProps> = ({
   const [sessions, setSessions] = React.useState<SavedSession[]>([]);
 
   React.useEffect(() => {
-    setSessions(getSavedSessions(host));
-  }, [host]);
+    setSessions(getSavedSessions(host, scopeKey));
+  }, [host, scopeKey]);
 
   const handleDelete = (e: React.MouseEvent, sessionId: string) => {
     e.stopPropagation();
-    deleteSession(host, sessionId);
-    setSessions(getSavedSessions(host));
+    deleteSession(host, scopeKey, sessionId);
+    setSessions(getSavedSessions(host, scopeKey));
   };
 
   const hostLabel = host === "powerpoint" ? "PowerPoint" : host === "word" ? "Word" : "Excel";

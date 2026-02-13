@@ -6,8 +6,9 @@ export const insertChart: Tool = {
 
 Parameters:
 - dataRange: The range containing the data (e.g., "A1:D10", "Sheet1!B2:E20")
-- chartType: Type of chart to create:
-  - "column" (default), "bar", "line", "pie", "area", "scatter", "doughnut"
+- chartType: Type of chart to create. Supports validated Excel chart types (e.g.,
+  "column", "bar", "line", "pie", "area", "scatter", "doughnut", "surface",
+  "surfaceTopView", "surfaceWireframe", "stockOHLC", "treemap", "waterfall", etc.)
 - title: Optional chart title
 - sheetName: Optional worksheet to place the chart on. Defaults to active sheet.
 
@@ -26,8 +27,7 @@ Examples:
       },
       chartType: {
         type: "string",
-        enum: ["column", "bar", "line", "pie", "area", "scatter", "doughnut"],
-        description: "The type of chart to create. Default is 'column'.",
+        description: "The type of chart to create. Validated against Excel.ChartType values. Default is 'column'.",
       },
       title: {
         type: "string",
@@ -40,7 +40,8 @@ Examples:
     },
     required: ["dataRange"],
   },
-  handler: async ({ arguments: args }) => {
+  handler: async (input: any) => {
+    const args = input?.arguments ?? {};
     const { dataRange, chartType = "column", title, sheetName } = args as {
       dataRange: string;
       chartType?: string;
@@ -64,18 +65,37 @@ Examples:
         range.load(["address", "left", "top", "width"]);
         await context.sync();
 
-        // Map chart type string to Excel.ChartType
-        const chartTypeMap: { [key: string]: Excel.ChartType } = {
-          "column": Excel.ChartType.columnClustered,
-          "bar": Excel.ChartType.barClustered,
-          "line": Excel.ChartType.line,
-          "pie": Excel.ChartType.pie,
-          "area": Excel.ChartType.area,
-          "scatter": Excel.ChartType.xyscatter,
-          "doughnut": Excel.ChartType.doughnut,
+        // Resolve and validate chart type against Excel.ChartType values.
+        const normalizedInput = chartType.toLowerCase().replace(/[\s_-]/g, "");
+        const aliasMap: Record<string, string> = {
+          column: "ColumnClustered",
+          bar: "BarClustered",
+          line: "Line",
+          pie: "Pie",
+          area: "Area",
+          scatter: "XYScatter",
+          doughnut: "Doughnut",
+          donut: "Doughnut",
+          surface: "Surface",
+          surfaceside: "Surface",
+          surface3d: "Surface",
+          stock: "StockOHLC",
         };
 
-        const excelChartType = chartTypeMap[chartType.toLowerCase()] || Excel.ChartType.columnClustered;
+        const requestedChartType = aliasMap[normalizedInput] || chartType;
+        const supportedChartTypes = Object.values(Excel.ChartType) as string[];
+
+        const resolvedChartType = supportedChartTypes.find(
+          (value) => value.toLowerCase() === requestedChartType.toLowerCase()
+        );
+
+        const fallbackPreferred = normalizedInput.includes("surface") ? "SurfaceTopView" : "ColumnClustered";
+        const fallbackChartType = supportedChartTypes.find(
+          (value) => value.toLowerCase() === fallbackPreferred.toLowerCase()
+        ) || "ColumnClustered";
+
+        const finalChartType = (resolvedChartType || fallbackChartType) as unknown as Excel.ChartType;
+        const usedFallback = !resolvedChartType;
 
         // Calculate chart position (to the right of data)
         const chartLeft = range.left + range.width + 20;
@@ -85,7 +105,7 @@ Examples:
 
         // Add the chart
         const chart = sheet.charts.add(
-          excelChartType,
+          finalChartType,
           range,
           Excel.ChartSeriesBy.auto
         );
@@ -104,7 +124,11 @@ Examples:
 
         await context.sync();
 
-        return `Created ${chartType} chart from range ${dataRange}${title ? ` with title "${title}"` : ""} in worksheet "${sheet.name}".`;
+        const fallbackMessage = usedFallback
+          ? `${chartType} chart type isnt supported, i'll try another chart type. `
+          : "";
+
+        return `${fallbackMessage}Created ${resolvedChartType || fallbackChartType} chart from range ${dataRange}${title ? ` with title "${title}"` : ""} in worksheet "${sheet.name}".`;
       });
     } catch (e: any) {
       return { textResultForLlm: e.message, resultType: "failure", error: e.message, toolTelemetry: {} };

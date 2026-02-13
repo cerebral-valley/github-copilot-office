@@ -45,7 +45,7 @@ This document lists all available tools that GitHub Copilot can use when working
 | `get_selected_range` | Read the currently selected cells including values and formulas. |
 | `set_selected_range` | Write values to the currently selected range. |
 | `find_and_replace_cells` | Search and replace text in cells with case and whole-cell matching options. |
-| `insert_chart` | Create charts (column, bar, line, pie, area, scatter, doughnut) from a data range. |
+| `insert_chart` | Create charts from a data range using validated Excel chart types (including 3D/surface/stock families), with graceful fallback when a type isn't supported. |
 | `apply_cell_formatting` | Format cells with bold, colors, borders, number formats, and alignment. |
 | `create_named_range` | Define named ranges for easier reference in formulas and AI interactions. |
 | `add_worksheet` | Add a new worksheet to the workbook, optionally with a name and position. |
